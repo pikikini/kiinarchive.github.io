@@ -3,69 +3,510 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>기인 아카이브 - by date</title>
+  <title>기인 아카이브</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background-color: #f4f5fa;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+      background-color: #d6d8eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #222;
+      padding-bottom: 70px;
     }
-    .top-bar {
+
+    /* 상단 헤더 */
+    .header {
+      position: sticky;
+      top: 0;
+      background-color: #d6d8eb;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+    .header-left {
+      width: 60px;
+      display: flex;
+      align-items: center;
+    }
+    .back-btn {
+      text-decoration: none;
+      color: #222;
+      font-size: 24px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .header-center {
       text-align: center;
-      padding: 20px;
+    }
+    .header-name {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .header-sub {
+      font-size: 11px;
+      color: #6b6e85;
+      margin-top: 2px;
+    }
+    .header-right {
+      width: 60px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: #222;
+      font-size: 19px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    /* 슬라이드 사이드 메뉴 */
+    .menu-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 200;
+    }
+    .menu-overlay.open {
+      display: block;
+    }
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      right: -270px;
+      width: 260px;
+      height: 100%;
+      background: #ffffff;
+      z-index: 201;
+      transition: right 0.25s ease;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -2px 0 12px rgba(0,0,0,0.1);
+    }
+    .side-drawer.open {
+      right: 0;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 16px;
+    }
+    .drawer-title {
       font-weight: 700;
       font-size: 16px;
       color: #222;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding: 10px 16px 30px;
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+    }
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .menu-item:hover, .menu-item.active {
+      background: #eef0fa;
+      color: #5b62a8;
+    }
+
+    /* 날짜 알약 배지 */
+    .date-pill-wrap {
+      text-align: center;
+      margin: 18px 0 18px;
+    }
+    .date-pill {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.45);
+      color: #4a4d63;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 14px;
+    }
+
+    /* 채팅 영역 */
+    .chat-container {
       max-width: 480px;
       margin: 0 auto;
+      padding: 0 14px;
     }
-    .date-card {
-      background: #ffffff;
-      aspect-ratio: 1 / 1;
+    .msg-group {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .profile-img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      flex-shrink: 0;
+      background: #fff;
+    }
+    .msg-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: calc(100% - 50px);
+    }
+    .sender-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    .sender-name {
+      font-weight: 700;
+      color: #222;
+    }
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      background: #222;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 8px;
+      margin: 0 5px 0 3px;
+    }
+    .msg-time {
+      color: #6b6e85;
+      font-size: 11px;
+    }
+
+    /* 채팅 첨부 이미지 */
+    .chat-photo {
+      max-width: 230px;
+      width: 100%;
       border-radius: 16px;
+      margin-bottom: 5px;
+      display: block;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* 일반 말풍선 */
+    .bubble {
+      background: #ffffff;
+      padding: 10px 15px;
+      border-radius: 18px;
+      font-size: 14.5px;
+      line-height: 1.45;
+      margin-bottom: 5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      word-break: keep-all;
+      white-space: pre-line;
+    }
+
+    /* 답장 말풍선 */
+    .reply-bubble {
+      background: #ffffff;
+      padding: 11px 15px;
+      border-radius: 16px;
+      font-size: 14.5px;
+      line-height: 1.45;
+      margin-bottom: 5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      width: 100%;
+    }
+    .reply-header {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 2px;
+    }
+    .reply-question {
+      font-size: 12.5px;
+      color: #777;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ececec;
+      line-height: 1.4;
+    }
+    .reply-answer {
+      display: flex;
+      align-items: flex-start;
+      color: #222;
+      white-space: pre-line;
+    }
+    .reply-arrow {
+      margin-right: 6px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* 사진 모아보기 뷰 */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding-top: 10px;
+    }
+    .gallery-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #222;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .gallery-card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+    }
+    .gallery-caption {
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      text-align: center;
+    }
+
+    /* 하단 장식용 입력창 */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      padding: 10px 14px;
       display: flex;
       justify-content: center;
+      border-top: 1px solid #e5e6f0;
+    }
+    .fake-input {
+      width: 100%;
+      max-width: 480px;
+      background: #f2f3f7;
+      border-radius: 20px;
+      padding: 9px 16px;
+      color: #999;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      transition: transform 0.15s;
-    }
-    .date-card:active {
-      transform: scale(0.97);
-    }
-    .badge {
-      background: #8b90c2;
-      color: #ffffff;
-      padding: 5px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">by date</div>
-  <div class="grid" id="date-grid"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="header">
+    <div class="header-left">
+      <a href="dates.html" class="back-btn" title="날짜 목록으로">‹</a>
+    </div>
+    <div class="header-center">
+      <div class="header-name">기인 ⌄</div>
+      <div class="header-sub" id="header-date-sub">archive</div>
+    </div>
+    <div class="header-right">
+      <a href="dates.html" class="icon-btn" title="날짜별 보기">📅</a>
+      <button class="icon-btn" onclick="toggleMenu(true)" title="메뉴 열기">☰</button>
+    </div>
+  </div>
+
+  <!-- 우측 슬라이드 메뉴 -->
+  <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu(false)"></div>
+  <div class="side-drawer" id="side-drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">메뉴</span>
+      <button class="close-btn" onclick="toggleMenu(false)">×</button>
+    </div>
+    <ul class="menu-list">
+      <li><a class="menu-item" id="nav-latest" href="index.html">💬 최신 채팅방</a></li>
+      <li><a class="menu-item" href="dates.html">📅 날짜별 보기 (by date)</a></li>
+      <li><a class="menu-item" id="nav-all" href="index.html?mode=all">📜 전체 채팅 이어보기</a></li>
+      <li><a class="menu-item" id="nav-photos" href="index.html?mode=photos">🖼️ 사진 모아보기</a></li>
+    </ul>
+  </div>
+
+  <!-- 메인 채팅 / 콘텐츠 영역 -->
+  <div class="chat-container" id="chat-box"></div>
+
+  <!-- 하단 입력창 -->
+  <div class="bottom-bar">
+    <div class="fake-input">
+      <span>Send a message</span>
+      <span>☺</span>
+    </div>
+  </div>
 
   <script>
+    function toggleMenu(open) {
+      document.getElementById('menu-overlay').classList.toggle('open', open);
+      document.getElementById('side-drawer').classList.toggle('open', open);
+    }
+
+    function formatFullDate(yymmdd) {
+      if (!yymmdd || yymmdd.length !== 6) return yymmdd;
+      const year = 2000 + parseInt(yymmdd.slice(0, 2), 10);
+      const month = parseInt(yymmdd.slice(2, 4), 10) - 1;
+      const day = parseInt(yymmdd.slice(4, 6), 10);
+      const dateObj = new Date(year, month, day);
+      return dateObj.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    function renderDaySection(chatBox, dateKey, groups) {
+      // 날짜 배지 추가
+      const pillWrap = document.createElement('div');
+      pillWrap.className = 'date-pill-wrap';
+      pillWrap.innerHTML = `<span class="date-pill">${formatFullDate(dateKey)}</span>`;
+      chatBox.appendChild(pillWrap);
+
+      // 말풍선 그룹 렌더링
+      groups.forEach(group => {
+        const row = document.createElement('div');
+        row.className = 'msg-group';
+        let contentHTML = '';
+
+        if (group.image && !group.imageAfterText) {
+          contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
+        }
+
+        if (group.texts && group.time === "23:09") {
+          group.texts.forEach(txt => {
+            contentHTML += `<div class="bubble">${txt}</div>`;
+          });
+          if (group.replies) {
+            group.replies.forEach(rep => {
+              contentHTML += `
+                <div class="reply-bubble">
+                  <div class="reply-header">기인's reply</div>
+                  ${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}
+                  <div class="reply-answer">
+                    <span class="reply-arrow">↳</span>
+                    <span>${rep.a}</span>
+                  </div>
+                </div>
+              `;
+            });
+          }
+        } else {
+          if (group.replies) {
+            group.replies.forEach(rep => {
+              contentHTML += `
+                <div class="reply-bubble">
+                  <div class="reply-header">기인's reply</div>
+                  ${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}
+                  <div class="reply-answer">
+                    <span class="reply-arrow">↳</span>
+                    <span>${rep.a}</span>
+                  </div>
+                </div>
+              `;
+            });
+          }
+          if (group.texts) {
+            group.texts.forEach(txt => {
+              contentHTML += `<div class="bubble">${txt}</div>`;
+            });
+          }
+        }
+
+        if (group.image && group.imageAfterText) {
+          contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
+        }
+
+        row.innerHTML = `
+          <img src="profile.jpg" alt="기인" class="profile-img">
+          <div class="msg-right">
+            <div class="sender-row">
+              <span class="sender-name">기인</span>
+              <span class="verified-badge">✓</span>
+              <span class="msg-time">${group.time}</span>
+            </div>
+            ${contentHTML}
+          </div>
+        `;
+        chatBox.appendChild(row);
+      });
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    const requestedDate = params.get('date');
+
     fetch('data.json')
       .then(res => res.json())
       .then(data => {
-        const grid = document.getElementById('date-grid');
-        Object.keys(data).forEach(date => {
-          const card = document.createElement('a');
-          card.href = `chat.html?date=${date}`;
-          card.className = 'date-card';
-          card.innerHTML = `<span class="badge">${date}</span>`;
-          grid.appendChild(card);
-        });
+        const allDates = Object.keys(data);
+        const chatBox = document.getElementById('chat-box');
+
+        if (mode === 'all') {
+          // 1. 전체 채팅 이어보기 모드
+          document.getElementById('nav-all').classList.add('active');
+          document.getElementById('header-date-sub').textContent = `전체 기록 (${allDates.length}일)`;
+          allDates.forEach(d => renderDaySection(chatBox, d, data[d]));
+
+        } else if (mode === 'photos') {
+          // 2. 사진 모아보기 모드
+          document.getElementById('nav-photos').classList.add('active');
+          document.getElementById('header-date-sub').textContent = '사진 모아보기';
+          const grid = document.createElement('div');
+          grid.className = 'gallery-grid';
+          allDates.forEach(d => {
+            data[d].forEach(g => {
+              if (g.image) {
+                const card = document.createElement('a');
+                card.href = `index.html?date=${d}`;
+                card.className = 'gallery-card';
+                card.innerHTML = `
+                  <img src="${g.image}" alt="${d}">
+                  <div class="gallery-caption">20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}</div>
+                `;
+                grid.appendChild(card);
+              }
+            });
+          });
+          chatBox.appendChild(grid);
+
+        } else {
+          // 3. 기본 모드: 지정한 날짜 또는 가장 마지막(최신) 날짜의 채팅방 열기
+          document.getElementById('nav-latest').classList.add('active');
+          const targetDate = requestedDate || allDates[allDates.length - 1];
+          document.getElementById('header-date-sub').textContent = `20${targetDate.slice(0,2)}년 ${parseInt(targetDate.slice(2,4),10)}월 ${parseInt(targetDate.slice(4,6),10)}일`;
+          renderDaySection(chatBox, targetDate, data[targetDate] || []);
+        }
       });
   </script>
 </body>
