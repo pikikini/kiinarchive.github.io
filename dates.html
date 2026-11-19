@@ -64,7 +64,7 @@
       background: #ffffff;
       z-index: 201;
       transition: right 0.25s ease;
-      padding: 24px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       box-shadow: -2px 0 12px rgba(0,0,0,0.1);
@@ -72,14 +72,11 @@
     .side-drawer.open { right: 0; }
     .drawer-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
-    .drawer-title { font-weight: 700; font-size: 16px; color: #222; }
-    .close-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #666; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; line-height: 1; }
     .menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
     .menu-item {
       display: flex;
@@ -142,13 +139,12 @@
   <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <span class="drawer-title">메뉴</span>
       <button class="close-btn" onclick="toggleMenu(false)">×</button>
     </div>
     <ul class="menu-list">
-      <li><a class="menu-item active" href="dates.html">by date</a></li>
       <li><a class="menu-item" href="index.html">💌</a></li>
       <li><a class="menu-item" href="index.html?mode=photos">🖼️</a></li>
+      <li><a class="menu-item active" href="dates.html">by date</a></li>
     </ul>
   </div>
 
