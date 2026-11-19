@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기인 아카이브 - by date</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #f4f5fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    }
+    .top-bar {
+      text-align: center;
+      padding: 20px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #222;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 10px 16px 30px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .date-card {
+      background: #ffffff;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.15s;
+    }
+    .date-card:active {
+      transform: scale(0.97);
+    }
+    .badge {
+      background: #8b90c2;
+      color: #ffffff;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">by date</div>
+  <div class="grid" id="date-grid"></div>
+
+  <script>
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        const grid = document.getElementById('date-grid');
+        Object.keys(data).forEach(date => {
+          const card = document.createElement('a');
+          card.href = `chat.html?date=${date}`;
+          card.className = 'date-card';
+          card.innerHTML = `<span class="badge">${date}</span>`;
+          grid.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>
