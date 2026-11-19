@@ -376,7 +376,7 @@
 
     // 2026년 11월 8일부터 경과 일수 자동 계산 (11월 8일 당일 = 1일)
     function getTogetherDays() {
-      const startDate = new Date(2026, 10, 8); // JS에서 10은 11월을 의미
+      const startDate = new Date(2026, 0, 8); // JS에서 10은 11월을 의미
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const diffTime = today - startDate;
