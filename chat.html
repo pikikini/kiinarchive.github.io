@@ -6,185 +6,134 @@
   <title>기인 POP</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; background-color: #d6d8eb; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #222; padding-bottom: 70px; }
-    .header { position: sticky; top: 0; background-color: #d6d8eb; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
-    .header-left { width: 60px; display: flex; align-items: center; }
-    .back-btn { text-decoration: none; color: #222; font-size: 24px; font-weight: 300; line-height: 1; cursor: pointer; }
-    .header-center { text-align: center; }
-    .header-name { font-size: 16px; font-weight: 700; }
-    .header-sub { font-size: 11px; color: #6b6e85; margin-top: 2px; }
-    .header-right { width: 60px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
-    .icon-btn { background: none; border: none; padding: 0; cursor: pointer; color: #222; font-size: 19px; text-decoration: none; display: flex; align-items: center; }
-
-    /* 슬라이드 메뉴 */
-    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 200; }
-    .menu-overlay.open { display: block; }
-    .side-drawer { position: fixed; top: 0; right: -270px; width: 260px; height: 100%; background: #ffffff; z-index: 201; transition: right 0.25s ease; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: -2px 0 12px rgba(0,0,0,0.1); }
-    .side-drawer.open { right: 0; }
-    .drawer-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; }
-    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; line-height: 1; }
-    .menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-    .menu-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: #333; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .menu-item:hover, .menu-item.active { background: #eef0fa; color: #5b62a8; }
-    .drawer-footer { padding-top: 14px; border-top: 1px solid #eee; font-size: 11.5px; line-height: 1.55; color: #666; word-break: keep-all; }
-    .drawer-footer p { margin: 0 0 6px 0; }
-    .drawer-footer p:last-child { margin-bottom: 0; color: #888; font-size: 11px; }
-    .handle-link { font-weight: 700; text-decoration: underline; color: #222; }
-
-    /* 채팅 본문 */
-    .date-pill-wrap { text-align: center; margin: 18px 0; }
-    .date-pill { display: inline-block; background: rgba(255, 255, 255, 0.45); color: #4a4d63; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 14px; }
-    .chat-container { max-width: 480px; margin: 0 auto; padding: 0 14px; }
-    .msg-group { display: flex; align-items: flex-start; margin-bottom: 14px; }
-    .profile-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; margin-right: 10px; flex-shrink: 0; background: #fff; }
-    .msg-right { display: flex; flex-direction: column; align-items: flex-start; max-width: calc(100% - 50px); }
-    .sender-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 12px; }
-    .sender-name { font-weight: 700; color: #222; }
-    .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; background: #222; color: #fff; border-radius: 50%; font-size: 8px; margin: 0 5px 0 3px; }
-    .msg-time { color: #6b6e85; font-size: 11px; }
-    .chat-photo { max-width: 230px; width: 100%; border-radius: 16px; margin-bottom: 5px; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .bubble { background: #ffffff; padding: 10px 15px; border-radius: 18px; font-size: 14.5px; line-height: 1.45; margin-bottom: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); word-break: keep-all; white-space: pre-line; }
-    .reply-bubble { background: #ffffff; padding: 11px 15px; border-radius: 16px; font-size: 14.5px; line-height: 1.45; margin-bottom: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); width: 100%; }
-    .reply-header { font-size: 11.5px; font-weight: 700; color: #444; margin-bottom: 2px; }
-    .reply-question { font-size: 12.5px; color: #777; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid #ececec; line-height: 1.4; }
-    .reply-answer { display: flex; align-items: flex-start; color: #222; white-space: pre-line; }
-    .reply-arrow { margin-right: 6px; font-weight: bold; color: #333; }
-    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-top: 10px; }
-    .gallery-card { background: #fff; border-radius: 14px; overflow: hidden; text-decoration: none; color: #222; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    .gallery-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
-    .gallery-caption { padding: 8px 10px; font-size: 12px; font-weight: 600; color: #555; text-align: center; }
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; padding: 10px 14px; display: flex; justify-content: center; border-top: 1px solid #e5e6f0; }
-    .fake-input { width: 100%; max-width: 480px; background: #f2f3f7; border-radius: 20px; padding: 9px 16px; color: #999; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #e4e6f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+    .home-card {
+      width: 100%;
+      max-width: 400px;
+      min-height: 410px;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 6px 24px rgba(85, 92, 148, 0.09);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid #eceef7;
+      background: #fafbfe;
+    }
+    .tab-item {
+      padding: 16px 0;
+      text-align: center;
+      text-decoration: none;
+      font-size: 19px;
+      border-right: 1px solid #eceef7;
+      transition: background 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .tab-item:last-child { border-right: none; }
+    .tab-item:hover, .tab-item:active { background: #eef0fa; }
+    .card-body {
+      padding: 36px 26px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .archive-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #2c2f42;
+      margin: 0 0 16px 0;
+    }
+    .read-toggle {
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #7b809e;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+      font-family: inherit;
+    }
+    .read-toggle:hover { color: #4a4f70; }
+    .arrow-icon {
+      font-size: 10px;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+    .read-toggle.open .arrow-icon { transform: rotate(90deg); }
+    .read-content {
+      display: none;
+      margin-top: 12px;
+      padding: 15px 16px;
+      background: #f7f8fc;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: #555970;
+      word-break: keep-all;
+    }
+    .read-content.open { display: block; }
+    .guide-list {
+      margin: 0 0 12px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e6e8f2;
+    }
+    .notice-list { margin: 0; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
-      <a href="index.html" class="back-btn" title="home">‹</a>
+  <div class="home-card">
+    <div class="card-tabs">
+      <a href="chat.html" class="tab-item" title="전체 메시지">💌</a>
+      <a href="chat.html?mode=photos" class="tab-item" title="사진">🖼️</a>
+      <a href="dates.html" class="tab-item" title="날짜별">📅</a>
     </div>
-    <div class="header-center">
-      <div class="header-name">기인 ⌄</div>
-      <div class="header-sub" id="header-date-sub">함께한지 1일</div>
-    </div>
-    <div class="header-right">
-      <a href="dates.html" class="icon-btn" title="by date">📅</a>
-      <button class="icon-btn" onclick="toggleMenu(true)" title="메뉴">☰</button>
-    </div>
-  </div>
-
-  <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu(false)"></div>
-  <div class="side-drawer" id="side-drawer">
-    <div>
-      <div class="drawer-header">
-        <button class="close-btn" onclick="toggleMenu(false)">×</button>
+    <div class="card-body">
+      <h1 class="archive-title">2026 KIIN POP ARCHIVE 💌</h1>
+      <button class="read-toggle" id="read-btn" onclick="toggleRead()">
+        <span class="arrow-icon">▸</span>
+        <span>read</span>
+      </button>
+      <div class="read-content" id="read-box">
+        <div class="guide-list">
+          💌 전체 메시지 확인<br>
+          🖼️ 전체 사진 확인<br>
+          by date 날짜별 보기
+        </div>
+        <div class="notice-list">
+          ‼️<br>
+          - 무단 캡쳐•복제•배포를 금지합니다.<br>
+          - 오류, 문의사항은 @pikikini 계정으로 DM 부탁드립니다.
+        </div>
       </div>
-      <ul class="menu-list">
-        <li><a class="menu-item" href="index.html">🏠</a></li>
-        <li><a class="menu-item" id="nav-all" href="chat.html">💌</a></li>
-        <li><a class="menu-item" id="nav-photos" href="chat.html?mode=photos">🖼️</a></li>
-        <li><a class="menu-item" href="dates.html">by date</a></li>
-      </ul>
-    </div>
-    <div class="drawer-footer">
-      <p>오류, 문의는 <span class="handle-link">@pikikini</span> 계정으로 DM 주세요.</p>
-      <p>For errors or inquiries, please DM <span class="handle-link">@pikikini</span>.</p>
     </div>
   </div>
-
-  <div class="chat-container" id="chat-box"></div>
-
-  <div class="bottom-bar">
-    <div class="fake-input">
-      <span>Send a message</span>
-      <span>☺</span>
-    </div>
-  </div>
-
   <script>
-    function toggleMenu(open) {
-      document.getElementById('menu-overlay').classList.toggle('open', open);
-      document.getElementById('side-drawer').classList.toggle('open', open);
+    function toggleRead() {
+      document.getElementById('read-btn').classList.toggle('open');
+      document.getElementById('read-box').classList.toggle('open');
     }
-    function getTogetherDays() {
-      const startDate = new Date(2026, 0, 8);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-      return diffDays > 0 ? diffDays : 1;
-    }
-    function formatFullDate(yymmdd) {
-      if (!yymmdd || yymmdd.length !== 6) return yymmdd;
-      const dateObj = new Date(2000 + parseInt(yymmdd.slice(0, 2), 10), parseInt(yymmdd.slice(2, 4), 10) - 1, parseInt(yymmdd.slice(4, 6), 10));
-      return dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    }
-    function renderDaySection(chatBox, dateKey, groups) {
-      const pillWrap = document.createElement('div');
-      pillWrap.className = 'date-pill-wrap';
-      pillWrap.innerHTML = `<span class="date-pill">${formatFullDate(dateKey)}</span>`;
-      chatBox.appendChild(pillWrap);
-
-      groups.forEach(group => {
-        const row = document.createElement('div');
-        row.className = 'msg-group';
-        let contentHTML = '';
-        if (group.image && !group.imageAfterText) contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
-
-        if (group.texts && group.time === "23:09") {
-          group.texts.forEach(txt => { contentHTML += `<div class="bubble">${txt}</div>`; });
-          if (group.replies) {
-            group.replies.forEach(rep => {
-              contentHTML += `<div class="reply-bubble"><div class="reply-header">기인님의 답장</div>${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}<div class="reply-answer"><span class="reply-arrow">↳</span><span>${rep.a}</span></div></div>`;
-            });
-          }
-        } else {
-          if (group.replies) {
-            group.replies.forEach(rep => {
-              contentHTML += `<div class="reply-bubble"><div class="reply-header">기인님의 답장</div>${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}<div class="reply-answer"><span class="reply-arrow">↳</span><span>${rep.a}</span></div></div>`;
-            });
-          }
-          if (group.texts) group.texts.forEach(txt => { contentHTML += `<div class="bubble">${txt}</div>`; });
-        }
-        if (group.image && group.imageAfterText) contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
-
-        row.innerHTML = `<img src="profile.jpg" alt="기인" class="profile-img"><div class="msg-right"><div class="sender-row"><span class="sender-name">기인</span><span class="verified-badge">✓</span><span class="msg-time">${group.time}</span></div>${contentHTML}</div>`;
-        chatBox.appendChild(row);
-      });
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get('mode');
-    const requestedDate = params.get('date');
-    document.getElementById('header-date-sub').textContent = `함께한지 ${getTogetherDays()}일`;
-
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        const allDates = Object.keys(data);
-        const chatBox = document.getElementById('chat-box');
-        if (requestedDate) {
-          document.getElementById('header-date-sub').textContent = `20${requestedDate.slice(0,2)}년 ${parseInt(requestedDate.slice(2,4),10)}월 ${parseInt(requestedDate.slice(4,6),10)}일`;
-          renderDaySection(chatBox, requestedDate, data[requestedDate] || []);
-        } else if (mode === 'photos') {
-          document.getElementById('nav-photos').classList.add('active');
-          const grid = document.createElement('div');
-          grid.className = 'gallery-grid';
-          allDates.forEach(d => {
-            data[d].forEach(g => {
-              if (g.image) {
-                const card = document.createElement('a');
-                card.href = `chat.html?date=${d}`;
-                card.className = 'gallery-card';
-                card.innerHTML = `<img src="${g.image}" alt="${d}"><div class="gallery-caption">20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}</div>`;
-                grid.appendChild(card);
-              }
-            });
-          });
-          chatBox.appendChild(grid);
-        } else {
-          document.getElementById('nav-all').classList.add('active');
-          allDates.forEach(d => renderDaySection(chatBox, d, data[d]));
-        }
-      });
   </script>
 </body>
 </html>
