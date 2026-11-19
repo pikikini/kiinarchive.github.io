@@ -133,7 +133,7 @@
       border-radius: 12px;
       text-decoration: none;
       color: #333;
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s;
@@ -331,14 +331,14 @@
   <!-- 상단 헤더 -->
   <div class="header">
     <div class="header-left">
-      <a href="dates.html" class="back-btn" title="날짜 목록으로">‹</a>
+      <a href="dates.html" class="back-btn" title="by date">‹</a>
     </div>
     <div class="header-center">
       <div class="header-name">기인 ⌄</div>
-      <div class="header-sub" id="header-date-sub">archive</div>
+      <div class="header-sub" id="header-date-sub">함께한지 1일</div>
     </div>
     <div class="header-right">
-      <a href="dates.html" class="icon-btn" title="날짜별 보기">📅</a>
+      <a href="dates.html" class="icon-btn" title="by date">📅</a>
       <button class="icon-btn" onclick="toggleMenu(true)" title="메뉴 열기">☰</button>
     </div>
   </div>
@@ -351,10 +351,9 @@
       <button class="close-btn" onclick="toggleMenu(false)">×</button>
     </div>
     <ul class="menu-list">
-      <li><a class="menu-item" id="nav-all" href="index.html">📜 전체 채팅 이어보기</a></li>
-      <li><a class="menu-item" href="dates.html">📅 날짜별 보기 (by date)</a></li>
-      <li><a class="menu-item" id="nav-latest" href="index.html?mode=latest">💬 최신 날짜만 보기</a></li>
-      <li><a class="menu-item" id="nav-photos" href="index.html?mode=photos">🖼️ 사진 모아보기</a></li>
+      <li><a class="menu-item" href="dates.html">by date</a></li>
+      <li><a class="menu-item" id="nav-all" href="index.html">💌</a></li>
+      <li><a class="menu-item" id="nav-photos" href="index.html?mode=photos">🖼️</a></li>
     </ul>
   </div>
 
@@ -373,6 +372,16 @@
     function toggleMenu(open) {
       document.getElementById('menu-overlay').classList.toggle('open', open);
       document.getElementById('side-drawer').classList.toggle('open', open);
+    }
+
+    // 2026년 11월 8일부터 경과 일수 자동 계산 (11월 8일 당일 = 1일)
+    function getTogetherDays() {
+      const startDate = new Date(2026, 10, 8); // JS에서 10은 11월을 의미
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffTime = today - startDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      return diffDays > 0 ? diffDays : 1;
     }
 
     function formatFullDate(yymmdd) {
@@ -464,6 +473,9 @@
     const mode = params.get('mode');
     const requestedDate = params.get('date');
 
+    // 상단 서브타이틀 기본값: 함께한지 ~일
+    document.getElementById('header-date-sub').textContent = `함께한지 ${getTogetherDays()}일`;
+
     fetch('data.json')
       .then(res => res.json())
       .then(data => {
@@ -471,8 +483,38 @@
         const chatBox = document.getElementById('chat-box');
 
         if (requestedDate) {
-          // 1. 날짜별 보기(dates.html)에서 특정 날짜를 클릭해서 들어온 경우
+          // 1. by date에서 특정 날짜를 클릭해서 들어온 경우
           const targetDate = requestedDate;
-          document.getElementById('header-date-sub').textContent = `20${targetDate.slice
+          document.getElementById('header-date-sub').textContent = `20${targetDate.slice(0,2)}년 ${parseInt(targetDate.slice(2,4),10)}월 ${parseInt(targetDate.slice(4,6),10)}일`;
+          renderDaySection(chatBox, targetDate, data[targetDate] || []);
+
+        } else if (mode === 'photos') {
+          // 2. 메뉴에서 🖼️(사진 모아보기)를 누른 경우
+          document.getElementById('nav-photos').classList.add('active');
+          const grid = document.createElement('div');
+          grid.className = 'gallery-grid';
+          allDates.forEach(d => {
+            data[d].forEach(g => {
+              if (g.image) {
+                const card = document.createElement('a');
+                card.href = `index.html?date=${d}`;
+                card.className = 'gallery-card';
+                card.innerHTML = `
+                  <img src="${g.image}" alt="${d}">
+                  <div class="gallery-caption">20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}</div>
+                `;
+                grid.appendChild(card);
+              }
+            });
+          });
+          chatBox.appendChild(grid);
+
+        } else {
+          // 3. 기본 첫 화면: 처음 링크 접속 시 무조건 전체 채팅 이어보기 출력
+          document.getElementById('nav-all').classList.add('active');
+          allDates.forEach(d => renderDaySection(chatBox, d, data[d]));
+        }
+      });
+  </script>
 </body>
 </html>
