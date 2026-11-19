@@ -6,16 +6,16 @@
   <title>기인 POP</title>
   <style>
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #222; }
+
+    /* 1. 홈 화면 뷰 */
+    #home-view {
       min-height: 100vh;
       background-color: #e4e6f5;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
-      color: #222;
     }
     .home-card {
       width: 100%;
@@ -34,25 +34,25 @@
       border-bottom: 1px solid #eceef7;
       background: #fafbfe;
     }
-    .tab-item {
-      padding: 16px 0;
-      text-align: center;
-      text-decoration: none;
-      font-size: 19px;
+    .tab-btn {
+      background: none;
+      border: none;
       border-right: 1px solid #eceef7;
-      transition: background 0.15s;
+      padding: 16px 0;
+      font-size: 19px;
+      cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: background 0.15s;
     }
-    .tab-item:last-child { border-right: none; }
-    .tab-item:hover, .tab-item:active { background: #eef0fa; }
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn:hover, .tab-btn:active { background: #eef0fa; }
     .card-body {
       padding: 36px 26px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
     }
     .archive-title {
       font-size: 16px;
@@ -75,12 +75,7 @@
       width: fit-content;
       font-family: inherit;
     }
-    .read-toggle:hover { color: #4a4f70; }
-    .arrow-icon {
-      font-size: 10px;
-      transition: transform 0.2s ease;
-      display: inline-block;
-    }
+    .arrow-icon { font-size: 10px; transition: transform 0.2s ease; display: inline-block; }
     .read-toggle.open .arrow-icon { transform: rotate(90deg); }
     .read-content {
       display: none;
@@ -94,46 +89,414 @@
       word-break: keep-all;
     }
     .read-content.open { display: block; }
-    .guide-list {
-      margin: 0 0 12px 0;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e6e8f2;
-    }
+    .guide-list { margin: 0 0 12px 0; padding-bottom: 12px; border-bottom: 1px solid #e6e8f2; }
     .notice-list { margin: 0; }
+
+    /* 2. 채팅 & 사진 뷰 */
+    #chat-view {
+      display: none;
+      min-height: 100vh;
+      background-color: #d6d8eb;
+      padding-bottom: 70px;
+      transition: background-color 0.25s;
+    }
+    .header { position: sticky; top: 0; background-color: inherit; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
+    .header-left { width: 60px; }
+    .header-center { text-align: center; cursor: pointer; user-select: none; }
+    .header-name-btn { background: none; border: none; padding: 0; font-family: inherit; font-size: 16px; font-weight: 700; color: #222; display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+    .chevron-down { width: 12px; height: 12px; stroke: #444; stroke-width: 2.2; fill: none; }
+    .header-sub { font-size: 11px; color: #6b6e85; margin-top: 2px; }
+    .header-right { width: 60px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+    .icon-btn { background: none; border: none; padding: 0; cursor: pointer; color: #222; font-size: 19px; display: flex; align-items: center; }
+
+    .date-pill-wrap { text-align: center; margin: 18px 0; }
+    .date-pill { display: inline-block; background: rgba(255, 255, 255, 0.45); color: #4a4d63; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 14px; }
+    .chat-container { max-width: 480px; margin: 0 auto; padding: 0 14px; }
+    .msg-group { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .profile-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; margin-right: 10px; flex-shrink: 0; background: #fff; }
+    .msg-right { display: flex; flex-direction: column; align-items: flex-start; max-width: calc(100% - 50px); }
+    .sender-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 12px; }
+    .sender-name { font-weight: 700; color: #222; }
+    .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; background: #222; color: #fff; border-radius: 50%; font-size: 8px; margin: 0 5px 0 3px; }
+    .msg-time { color: #6b6e85; font-size: 11px; }
+    .chat-photo { max-width: 230px; width: 100%; border-radius: 16px; margin-bottom: 5px; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .bubble { background: #ffffff; padding: 10px 15px; border-radius: 18px; font-size: 14.5px; line-height: 1.45; margin-bottom: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); word-break: keep-all; white-space: pre-line; }
+    .reply-bubble { background: #ffffff; padding: 11px 15px; border-radius: 16px; font-size: 14.5px; line-height: 1.45; margin-bottom: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); width: 100%; }
+    .reply-header { font-size: 11.5px; font-weight: 700; color: #444; margin-bottom: 2px; }
+    .reply-question { font-size: 12.5px; color: #777; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid #ececec; line-height: 1.4; }
+    .reply-answer { display: flex; align-items: flex-start; color: #222; white-space: pre-line; }
+    .reply-arrow { margin-right: 6px; font-weight: bold; color: #333; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-top: 10px; }
+    .gallery-card { background: #fff; border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .gallery-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+    .gallery-caption { padding: 8px 10px; font-size: 12px; font-weight: 600; color: #555; text-align: center; }
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; padding: 10px 14px; display: flex; justify-content: center; border-top: 1px solid #e5e6f0; }
+    .fake-input { width: 100%; max-width: 480px; background: #f2f3f7; border-radius: 20px; padding: 9px 16px; color: #999; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 3. 날짜별 보기(by date) 뷰 */
+    #dates-view {
+      display: none;
+      min-height: 100vh;
+      background-color: #f4f5fa;
+    }
+    .top-bar { position: sticky; top: 0; background: #f4f5fa; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; max-width: 480px; margin: 0 auto; z-index: 100; }
+    .top-left { width: 30px; }
+    .top-title { font-weight: 700; font-size: 16px; color: #222; }
+    .menu-btn { width: 30px; background: none; border: none; font-size: 20px; cursor: pointer; color: #222; text-align: right; padding: 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 6px 16px 30px; max-width: 480px; margin: 0 auto; }
+    .date-card { background: #ffffff; aspect-ratio: 1 / 1; border-radius: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.15s; }
+    .date-card:active { transform: scale(0.97); }
+    .badge { background: #8b90c2; color: #ffffff; padding: 5px 14px; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+
+    /* 기인 프로필 모달 팝업 */
+    .profile-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.42); z-index: 300; justify-content: center; align-items: center; padding: 20px; }
+    .profile-overlay.open { display: flex; }
+    .profile-modal { width: 100%; max-width: 340px; background: #f8f8fa; border-radius: 20px; padding: 28px 20px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); position: relative; }
+    .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; color: #999; cursor: pointer; padding: 0; line-height: 1; }
+    .modal-top { display: flex; flex-direction: column; align-items: center; margin-bottom: 22px; }
+    .modal-avatar { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; }
+    .modal-name { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 4px; }
+    .modal-days { font-size: 12px; color: #666; display: flex; align-items: center; gap: 4px; }
+    .modal-section { margin-bottom: 18px; }
+    .modal-section:last-child { margin-bottom: 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; font-weight: 600; color: #666; margin-bottom: 8px; padding: 0 2px; }
+    .section-more { background: none; border: none; color: #7a83c9; font-weight: 600; font-size: 11.5px; cursor: pointer; padding: 0; }
+    .storage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .storage-thumb { aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; background: #eceef5; cursor: pointer; }
+    .storage-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .setting-card { background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .setting-row { width: 100%; background: none; border: none; border-bottom: 1px solid #f1f2f6; padding: 13px 14px; display: flex; align-items: center; justify-content: space-between; font-family: inherit; font-size: 13.5px; font-weight: 500; color: #222; cursor: pointer; text-align: left; }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-left { display: flex; align-items: center; gap: 10px; }
+    .setting-val { font-size: 12px; color: #8b90c2; font-weight: 600; }
+
+    /* 공통 우측 슬라이드 메뉴 */
+    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 200; }
+    .menu-overlay.open { display: block; }
+    .side-drawer { position: fixed; top: 0; right: -270px; width: 260px; height: 100%; background: #ffffff; z-index: 201; transition: right 0.25s ease; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: -2px 0 12px rgba(0,0,0,0.1); }
+    .side-drawer.open { right: 0; }
+    .drawer-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; line-height: 1; }
+    .menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+    .menu-item { width: 100%; background: none; border: none; text-align: left; font-family: inherit; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; color: #333; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .menu-item:hover, .menu-item.active { background: #eef0fa; color: #5b62a8; }
+    .drawer-footer { padding-top: 14px; border-top: 1px solid #eee; font-size: 11.5px; line-height: 1.55; color: #666; word-break: keep-all; }
+    .drawer-footer p { margin: 0 0 6px 0; }
+    .drawer-footer p:last-child { margin-bottom: 0; color: #888; font-size: 11px; }
+    .handle-link { font-weight: 700; text-decoration: underline; color: #222; }
   </style>
 </head>
 <body>
-  <div class="home-card">
-    <div class="card-tabs">
-      <a href="chat.html" class="tab-item" title="전체 메시지">💌</a>
-      <a href="chat.html?mode=photos" class="tab-item" title="사진">🖼️</a>
-      <a href="dates.html" class="tab-item" title="날짜별">📅</a>
-    </div>
-    <div class="card-body">
-      <h1 class="archive-title">2026 KIIN POP ARCHIVE 💌</h1>
-      <button class="read-toggle" id="read-btn" onclick="toggleRead()">
-        <span class="arrow-icon">▸</span>
-        <span>read</span>
-      </button>
-      <div class="read-content" id="read-box">
-        <div class="guide-list">
-          💌 전체 메시지 확인 message<br>
-          🖼️ 전체 사진 확인 photo<br>
-          by date 날짜별 보기
-        </div>
-        <div class="notice-list">
-          ‼️<br>
-          - 무단 캡쳐•복제•배포를 금지합니다.<br>
-          - 오류, 문의사항은 @pikikini 계정으로 DM 부탁드립니다.
+
+  <!-- 1. 홈 화면 -->
+  <div id="home-view">
+    <div class="home-card">
+      <div class="card-tabs">
+        <button type="button" class="tab-btn" onclick="openView('all')" title="전체 메시지">💌</button>
+        <button type="button" class="tab-btn" onclick="openView('photos')" title="사진">🖼️</button>
+        <button type="button" class="tab-btn" onclick="openView('dates')" title="날짜별">📅</button>
+      </div>
+      <div class="card-body">
+        <h1 class="archive-title">2026 KIIN POP ARCHIVE 💌</h1>
+        <button type="button" class="read-toggle" id="read-btn" onclick="toggleRead()">
+          <span class="arrow-icon">▸</span>
+          <span>read</span>
+        </button>
+        <div class="read-content" id="read-box">
+          <div class="guide-list">
+            💌 전체 메시지 확인<br>
+            🖼️ 전체 사진 확인<br>
+            by date 날짜별 보기
+          </div>
+          <div class="notice-list">
+            ‼️<br>
+            - 무단 캡쳐•복제•배포를 금지합니다.<br>
+            - 오류, 문의사항은 @pikikini 계정으로 DM 부탁드립니다.
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- 2. 채팅 / 사진 화면 -->
+  <div id="chat-view">
+    <div class="header">
+      <div class="header-left"></div>
+      <div class="header-center" onclick="toggleProfileModal(true)">
+        <button class="header-name-btn" type="button">
+          <span>기인</span>
+          <svg class="chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="header-sub" id="header-date-sub">함께한지 1일</div>
+      </div>
+      <div class="header-right">
+        <button type="button" class="icon-btn" onclick="openView('dates')" title="by date">📅</button>
+        <button type="button" class="icon-btn" onclick="toggleMenu(true)" title="메뉴">☰</button>
+      </div>
+    </div>
+    <div class="chat-container" id="chat-box"></div>
+    <div class="bottom-bar">
+      <div class="fake-input">
+        <span>Send a message</span>
+        <span>☺</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 날짜별 보기 화면 -->
+  <div id="dates-view">
+    <div class="top-bar">
+      <div class="top-left"></div>
+      <span class="top-title">by date</span>
+      <button type="button" class="menu-btn" onclick="toggleMenu(true)">☰</button>
+    </div>
+    <div class="grid" id="date-grid"></div>
+  </div>
+
+  <!-- 기인 프로필 팝업 모달 -->
+  <div class="profile-overlay" id="profile-overlay" onclick="if(event.target===this) toggleProfileModal(false)">
+    <div class="profile-modal">
+      <button type="button" class="modal-close" onclick="toggleProfileModal(false)">×</button>
+      <div class="modal-top">
+        <img src="profile.jpg" alt="기인" class="modal-avatar">
+        <div class="modal-name">기인</div>
+        <div class="modal-days" id="modal-days-text">❤️ 함께한지 1일</div>
+      </div>
+      <div class="modal-section">
+        <div class="section-head">
+          <span>보관함</span>
+          <button type="button" class="section-more" onclick="toggleProfileModal(false); openView('photos');">전체보기</button>
+        </div>
+        <div class="storage-grid" id="modal-storage-grid"></div>
+      </div>
+      <div class="modal-section">
+        <div class="section-head"><span>맞춤 설정</span></div>
+        <div class="setting-card">
+          <button class="setting-row" type="button" onclick="changeNickname()">
+            <span class="setting-left"><span>👤</span><span>애칭 설정</span></span>
+            <span class="setting-val" id="nickname-display">기본</span>
+          </button>
+          <button class="setting-row" type="button" onclick="cycleBgColor()">
+            <span class="setting-left"><span>🖼️</span><span>배경 설정</span></span>
+            <span class="setting-val" id="bg-name-display">연보라</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 우측 슬라이드 메뉴 -->
+  <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu(false)"></div>
+  <div class="side-drawer" id="side-drawer">
+    <div>
+      <div class="drawer-header">
+        <button type="button" class="close-btn" onclick="toggleMenu(false)">×</button>
+      </div>
+      <ul class="menu-list">
+        <li><button type="button" class="menu-item" onclick="openView('home')">🏠</button></li>
+        <li><button type="button" class="menu-item" id="nav-all" onclick="openView('all')">💌</button></li>
+        <li><button type="button" class="menu-item" id="nav-photos" onclick="openView('photos')">🖼️</button></li>
+        <li><button type="button" class="menu-item" id="nav-dates" onclick="openView('dates')">by date</button></li>
+      </ul>
+    </div>
+    <div class="drawer-footer">
+      <p>오류, 문의는 <span class="handle-link">@pikikini</span> 계정으로 DM 주세요.</p>
+      <p>For errors or inquiries, please DM <span class="handle-link">@pikikini</span>.</p>
+    </div>
+  </div>
+
   <script>
+    let archiveData = null;
+
     function toggleRead() {
       document.getElementById('read-btn').classList.toggle('open');
       document.getElementById('read-box').classList.toggle('open');
     }
+    function toggleMenu(open) {
+      document.getElementById('menu-overlay').classList.toggle('open', open);
+      document.getElementById('side-drawer').classList.toggle('open', open);
+    }
+    function toggleProfileModal(open) {
+      document.getElementById('profile-overlay').classList.toggle('open', open);
+    }
+    function getTogetherDays() {
+      const startDate = new Date(2026, 0, 8);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      return diffDays > 0 ? diffDays : 1;
+    }
+
+    let userNickname = localStorage.getItem('kiin_nickname') || '';
+    function applyNickname() {
+      document.getElementById('nickname-display').textContent = userNickname || '기본';
+      document.querySelectorAll('.bubble, .reply-answer span:last-child').forEach(el => {
+        if (!el.dataset.orig) el.dataset.orig = el.innerHTML;
+        el.innerHTML = userNickname ? el.dataset.orig.replace(/ㅇㅇ/g, userNickname) : el.dataset.orig;
+      });
+    }
+    function changeNickname() {
+      const input = prompt('채팅 속 애칭(ㅇㅇ) 대신 표시할 이름을 입력하세요. (비우면 원래대로 돌아갑니다)', userNickname);
+      if (input !== null) {
+        userNickname = input.trim();
+        localStorage.setItem('kiin_nickname', userNickname);
+        applyNickname();
+      }
+    }
+
+    const bgThemes = [
+      { name: '연보라', color: '#d6d8eb' },
+      { name: '스카이블루', color: '#cfe0f5' },
+      { name: '피치핑크', color: '#f2dce2' },
+      { name: '민트크림', color: '#d6ebe4' }
+    ];
+    let bgIdx = parseInt(localStorage.getItem('kiin_bg_idx') || '0', 10);
+    function applyBgTheme() {
+      const theme = bgThemes[bgIdx % bgThemes.length];
+      document.getElementById('chat-view').style.backgroundColor = theme.color;
+      document.getElementById('bg-name-display').textContent = theme.name;
+    }
+    function cycleBgColor() {
+      bgIdx = (bgIdx + 1) % bgThemes.length;
+      localStorage.setItem('kiin_bg_idx', bgIdx);
+      applyBgTheme();
+    }
+
+    function formatFullDate(yymmdd) {
+      if (!yymmdd || yymmdd.length !== 6) return yymmdd;
+      const dateObj = new Date(2000 + parseInt(yymmdd.slice(0, 2), 10), parseInt(yymmdd.slice(2, 4), 10) - 1, parseInt(yymmdd.slice(4, 6), 10));
+      return dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function renderDaySection(chatBox, dateKey, groups) {
+      const pillWrap = document.createElement('div');
+      pillWrap.className = 'date-pill-wrap';
+      pillWrap.innerHTML = `<span class="date-pill">${formatFullDate(dateKey)}</span>`;
+      chatBox.appendChild(pillWrap);
+
+      groups.forEach(group => {
+        const row = document.createElement('div');
+        row.className = 'msg-group';
+        let contentHTML = '';
+        if (group.image && !group.imageAfterText) contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
+
+        if (group.texts && group.time === "23:09") {
+          group.texts.forEach(txt => { contentHTML += `<div class="bubble">${txt}</div>`; });
+          if (group.replies) {
+            group.replies.forEach(rep => {
+              contentHTML += `<div class="reply-bubble"><div class="reply-header">기인님의 답장</div>${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}<div class="reply-answer"><span class="reply-arrow">↳</span><span>${rep.a}</span></div></div>`;
+            });
+          }
+        } else {
+          if (group.replies) {
+            group.replies.forEach(rep => {
+              contentHTML += `<div class="reply-bubble"><div class="reply-header">기인님의 답장</div>${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}<div class="reply-answer"><span class="reply-arrow">↳</span><span>${rep.a}</span></div></div>`;
+            });
+          }
+          if (group.texts) group.texts.forEach(txt => { contentHTML += `<div class="bubble">${txt}</div>`; });
+        }
+        if (group.image && group.imageAfterText) contentHTML += `<img src="${group.image}" alt="첨부사진" class="chat-photo">`;
+
+        row.innerHTML = `<img src="profile.jpg" alt="기인" class="profile-img"><div class="msg-right"><div class="sender-row"><span class="sender-name">기인</span><span class="verified-badge">✓</span><span class="msg-time">${group.time}</span></div>${contentHTML}</div>`;
+        chatBox.appendChild(row);
+      });
+    }
+
+    function openView(viewName, specificDate) {
+      toggleMenu(false);
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('chat-view').style.display = 'none';
+      document.getElementById('dates-view').style.display = 'none';
+      document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+      window.scrollTo(0, 0);
+
+      if (viewName === 'home') {
+        document.getElementById('home-view').style.display = 'flex';
+        return;
+      }
+
+      if (viewName === 'dates') {
+        document.getElementById('dates-view').style.display = 'block';
+        document.getElementById('nav-dates').classList.add('active');
+        return;
+      }
+
+      document.getElementById('chat-view').style.display = 'block';
+      const chatBox = document.getElementById('chat-box');
+      chatBox.innerHTML = '';
+      const daysCount = getTogetherDays();
+
+      if (!archiveData) return;
+      const allDates = Object.keys(archiveData);
+
+      if (specificDate) {
+        document.getElementById('header-date-sub').textContent = `20${specificDate.slice(0,2)}년 ${parseInt(specificDate.slice(2,4),10)}월 ${parseInt(specificDate.slice(4,6),10)}일`;
+        renderDaySection(chatBox, specificDate, archiveData[specificDate] || []);
+      } else if (viewName === 'photos') {
+        document.getElementById('nav-photos').classList.add('active');
+        document.getElementById('header-date-sub').textContent = `함께한지 ${daysCount}일`;
+        const grid = document.createElement('div');
+        grid.className = 'gallery-grid';
+        allDates.forEach(d => {
+          archiveData[d].forEach(g => {
+            if (g.image) {
+              const card = document.createElement('div');
+              card.className = 'gallery-card';
+              card.onclick = () => openView('date', d);
+              card.innerHTML = `<img src="${g.image}" alt="${d}"><div class="gallery-caption">20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}</div>`;
+              grid.appendChild(card);
+            }
+          });
+        });
+        chatBox.appendChild(grid);
+      } else {
+        document.getElementById('nav-all').classList.add('active');
+        document.getElementById('header-date-sub').textContent = `함께한지 ${daysCount}일`;
+        allDates.forEach(d => renderDaySection(chatBox, d, archiveData[d]));
+      }
+      applyNickname();
+    }
+
+    const daysCount = getTogetherDays();
+    document.getElementById('header-date-sub').textContent = `함께한지 ${daysCount}일`;
+    document.getElementById('modal-days-text').textContent = `❤️ 함께한지 ${daysCount}일`;
+    applyBgTheme();
+
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        archiveData = data;
+        const allDates = Object.keys(data);
+
+        // 날짜 그리드 미리 채우기
+        const dateGrid = document.getElementById('date-grid');
+        allDates.forEach(date => {
+          const card = document.createElement('div');
+          card.className = 'date-card';
+          card.onclick = () => openView('date', date);
+          card.innerHTML = `<span class="badge">${date}</span>`;
+          dateGrid.appendChild(card);
+        });
+
+        // 프로필 모달 보관함 4칸 채우기
+        const storageGrid = document.getElementById('modal-storage-grid');
+        const photoItems = [];
+        allDates.forEach(d => {
+          data[d].forEach(g => { if (g.image) photoItems.push({ date: d, img: g.image }); });
+        });
+        photoItems.reverse().slice(0, 4).forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'storage-thumb';
+          div.onclick = () => { toggleProfileModal(false); openView('date', item.date); };
+          div.innerHTML = `<img src="${item.img}" alt="${item.date}">`;
+          storageGrid.appendChild(div);
+        });
+        while (storageGrid.children.length < 4) {
+          const empty = document.createElement('div');
+          empty.className = 'storage-thumb';
+          storageGrid.appendChild(empty);
+        }
+      });
   </script>
 </body>
 </html>
