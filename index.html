@@ -351,9 +351,9 @@
       <button class="close-btn" onclick="toggleMenu(false)">×</button>
     </div>
     <ul class="menu-list">
-      <li><a class="menu-item" id="nav-latest" href="index.html">💬 최신 채팅방</a></li>
+      <li><a class="menu-item" id="nav-all" href="index.html">📜 전체 채팅 이어보기</a></li>
       <li><a class="menu-item" href="dates.html">📅 날짜별 보기 (by date)</a></li>
-      <li><a class="menu-item" id="nav-all" href="index.html?mode=all">📜 전체 채팅 이어보기</a></li>
+      <li><a class="menu-item" id="nav-latest" href="index.html?mode=latest">💬 최신 날짜만 보기</a></li>
       <li><a class="menu-item" id="nav-photos" href="index.html?mode=photos">🖼️ 사진 모아보기</a></li>
     </ul>
   </div>
@@ -387,13 +387,11 @@
     }
 
     function renderDaySection(chatBox, dateKey, groups) {
-      // 날짜 배지 추가
       const pillWrap = document.createElement('div');
       pillWrap.className = 'date-pill-wrap';
       pillWrap.innerHTML = `<span class="date-pill">${formatFullDate(dateKey)}</span>`;
       chatBox.appendChild(pillWrap);
 
-      // 말풍선 그룹 렌더링
       groups.forEach(group => {
         const row = document.createElement('div');
         row.className = 'msg-group';
@@ -472,42 +470,9 @@
         const allDates = Object.keys(data);
         const chatBox = document.getElementById('chat-box');
 
-        if (mode === 'all') {
-          // 1. 전체 채팅 이어보기 모드
-          document.getElementById('nav-all').classList.add('active');
-          document.getElementById('header-date-sub').textContent = `전체 기록 (${allDates.length}일)`;
-          allDates.forEach(d => renderDaySection(chatBox, d, data[d]));
-
-        } else if (mode === 'photos') {
-          // 2. 사진 모아보기 모드
-          document.getElementById('nav-photos').classList.add('active');
-          document.getElementById('header-date-sub').textContent = '사진 모아보기';
-          const grid = document.createElement('div');
-          grid.className = 'gallery-grid';
-          allDates.forEach(d => {
-            data[d].forEach(g => {
-              if (g.image) {
-                const card = document.createElement('a');
-                card.href = `index.html?date=${d}`;
-                card.className = 'gallery-card';
-                card.innerHTML = `
-                  <img src="${g.image}" alt="${d}">
-                  <div class="gallery-caption">20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}</div>
-                `;
-                grid.appendChild(card);
-              }
-            });
-          });
-          chatBox.appendChild(grid);
-
-        } else {
-          // 3. 기본 모드: 지정한 날짜 또는 가장 마지막(최신) 날짜의 채팅방 열기
-          document.getElementById('nav-latest').classList.add('active');
-          const targetDate = requestedDate || allDates[allDates.length - 1];
-          document.getElementById('header-date-sub').textContent = `20${targetDate.slice(0,2)}년 ${parseInt(targetDate.slice(2,4),10)}월 ${parseInt(targetDate.slice(4,6),10)}일`;
-          renderDaySection(chatBox, targetDate, data[targetDate] || []);
-        }
-      });
-  </script>
+        if (requestedDate) {
+          // 1. 날짜별 보기(dates.html)에서 특정 날짜를 클릭해서 들어온 경우
+          const targetDate = requestedDate;
+          document.getElementById('header-date-sub').textContent = `20${targetDate.slice
 </body>
 </html>
