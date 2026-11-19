@@ -8,7 +8,7 @@
     * { box-sizing: border-box; }
     body { margin: 0; background-color: #f4f5fa; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; }
     .top-bar { position: sticky; top: 0; background: #f4f5fa; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; max-width: 480px; margin: 0 auto; z-index: 100; }
-    .top-left { width: 30px; text-decoration: none; color: #222; font-size: 24px; line-height: 1; }
+    .top-left { width: 30px; }
     .top-title { font-weight: 700; font-size: 16px; color: #222; }
     .menu-btn { width: 30px; background: none; border: none; font-size: 20px; cursor: pointer; color: #222; text-align: right; padding: 0; }
 
@@ -36,7 +36,7 @@
 </head>
 <body>
   <div class="top-bar">
-    <a href="index.html" class="top-left" title="home">‹</a>
+    <div class="top-left"></div>
     <span class="top-title">by date</span>
     <button class="menu-btn" onclick="toggleMenu(true)">☰</button>
   </div>
