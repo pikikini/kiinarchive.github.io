@@ -89,7 +89,7 @@
       background: #ffffff;
       z-index: 201;
       transition: right 0.25s ease;
-      padding: 24px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       box-shadow: -2px 0 12px rgba(0,0,0,0.1);
@@ -99,23 +99,18 @@
     }
     .drawer-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 16px;
-    }
-    .drawer-title {
-      font-weight: 700;
-      font-size: 16px;
-      color: #222;
+      margin-bottom: 12px;
     }
     .close-btn {
       background: none;
       border: none;
-      font-size: 22px;
+      font-size: 24px;
       cursor: pointer;
       color: #666;
+      padding: 0;
+      line-height: 1;
     }
     .menu-list {
       list-style: none;
@@ -347,13 +342,12 @@
   <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <span class="drawer-title">메뉴</span>
       <button class="close-btn" onclick="toggleMenu(false)">×</button>
     </div>
     <ul class="menu-list">
-      <li><a class="menu-item" href="dates.html">by date</a></li>
       <li><a class="menu-item" id="nav-all" href="index.html">💌</a></li>
       <li><a class="menu-item" id="nav-photos" href="index.html?mode=photos">🖼️</a></li>
+      <li><a class="menu-item" href="dates.html">by date</a></li>
     </ul>
   </div>
 
@@ -374,9 +368,9 @@
       document.getElementById('side-drawer').classList.toggle('open', open);
     }
 
-    // 2026년 1월 8일부터 경과 일수 자동 계산 (1월 8일 당일 = 1일)
+    // 2026년 1월 8일부터 경과 일수 자동 계산
     function getTogetherDays() {
-      const startDate = new Date(2026, 0, 8); // 2026년 1월 8일
+      const startDate = new Date(2026, 0, 8);
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const diffTime = today - startDate;
@@ -418,7 +412,7 @@
             group.replies.forEach(rep => {
               contentHTML += `
                 <div class="reply-bubble">
-                  <div class="reply-header">기인's reply</div>
+                  <div class="reply-header">기인님의 답장</div>
                   ${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}
                   <div class="reply-answer">
                     <span class="reply-arrow">↳</span>
@@ -433,7 +427,7 @@
             group.replies.forEach(rep => {
               contentHTML += `
                 <div class="reply-bubble">
-                  <div class="reply-header">기인's reply</div>
+                  <div class="reply-header">기인님의 답장</div>
                   ${rep.q ? `<div class="reply-question">${rep.q}</div>` : ''}
                   <div class="reply-answer">
                     <span class="reply-arrow">↳</span>
@@ -473,7 +467,6 @@
     const mode = params.get('mode');
     const requestedDate = params.get('date');
 
-    // 상단 서브타이틀 기본값: 함께한지 ~일
     document.getElementById('header-date-sub').textContent = `함께한지 ${getTogetherDays()}일`;
 
     fetch('data.json')
@@ -483,13 +476,11 @@
         const chatBox = document.getElementById('chat-box');
 
         if (requestedDate) {
-          // 1. by date에서 특정 날짜를 클릭해서 들어온 경우
           const targetDate = requestedDate;
           document.getElementById('header-date-sub').textContent = `20${targetDate.slice(0,2)}년 ${parseInt(targetDate.slice(2,4),10)}월 ${parseInt(targetDate.slice(4,6),10)}일`;
           renderDaySection(chatBox, targetDate, data[targetDate] || []);
 
         } else if (mode === 'photos') {
-          // 2. 메뉴에서 🖼️(사진 모아보기)를 누른 경우
           document.getElementById('nav-photos').classList.add('active');
           const grid = document.createElement('div');
           grid.className = 'gallery-grid';
@@ -510,7 +501,6 @@
           chatBox.appendChild(grid);
 
         } else {
-          // 3. 기본 첫 화면: 처음 링크 접속 시 무조건 전체 채팅 이어보기 출력
           document.getElementById('nav-all').classList.add('active');
           allDates.forEach(d => renderDaySection(chatBox, d, data[d]));
         }
